@@ -1,0 +1,15 @@
+digraph {
+	Y [label=Y shape=ellipse]
+	A [label=A shape=ellipse]
+	S [label=S shape=ellipse]
+	X [label=X shape=ellipse]
+	A -> S
+	A -> X
+	A -> Y
+	S -> X
+	S -> Y
+	X -> Y
+	Unobserved_0 [shape=point]
+	Unobserved_0 -> S [style=dashed]
+	Unobserved_0 -> Y [style=dashed]
+}
