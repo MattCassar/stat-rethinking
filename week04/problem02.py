@@ -18,54 +18,59 @@ seed = random.PRNGKey(0)
 
 
 def model(area=None, avgfood=None, group=None, groupsize=None, weight=None):
-    sigma = numpyro.sample('sigma', dist.Exponential(1))
+    sigma = numpyro.sample("sigma", dist.Exponential(1))
 
-    a = numpyro.sample('a', dist.Normal(0, 0.2))
+    a = numpyro.sample("a", dist.Normal(0, 0.2))
     regression = a
 
     if area is not None:
-        b_area = numpyro.sample('b_area', dist.Normal(0, 0.5))
+        b_area = numpyro.sample("b_area", dist.Normal(0, 0.5))
         regression += b_area * area
 
     if avgfood is not None:
-        b_avgfood = numpyro.sample('b_avgfood', dist.Normal(0, 0.5))
+        b_avgfood = numpyro.sample("b_avgfood", dist.Normal(0, 0.5))
         regression += b_avgfood * avgfood
 
     if group is not None:
-        b_group = numpyro.sample('b_group', dist.Normal(0, 0.5))
+        b_group = numpyro.sample("b_group", dist.Normal(0, 0.5))
         regression += b_group * group
 
     if groupsize is not None:
-        b_groupsize = numpyro.sample('b_groupsize', dist.Normal(0, 0.5))
+        b_groupsize = numpyro.sample("b_groupsize", dist.Normal(0, 0.5))
         regression += b_groupsize * groupsize
 
-    mu = numpyro.deterministic('mu', regression)
-    numpyro.sample('w', dist.Normal(mu, sigma), obs=weight)
+    mu = numpyro.deterministic("mu", regression)
+    numpyro.sample("w", dist.Normal(mu, sigma), obs=weight)
 
 
 def run_model(df):
     kernel = NUTS(model)
-    mcmc = MCMC(kernel, num_warmup=500, num_samples=500, num_chains=4, chain_method='sequential')
+    mcmc = MCMC(
+        kernel, num_warmup=500, num_samples=500, num_chains=4, chain_method="sequential"
+    )
     mcmc.run(seed, **{col: df[col].values for col in df.columns.tolist()})
 
     return mcmc
 
 
 def main():
-    df = pd.read_csv('foxes.csv', sep=';')
-    normalized_df=(df-df.mean())/df.std()
-    df_ind = df[['group', 'avgfood', 'groupsize', 'area']]
-    ind_vars = ['group', 'avgfood', 'groupsize', 'area']
+    df = pd.read_csv("foxes.csv", sep=";")
+    normalized_df = (df - df.mean()) / df.std()
+    df_ind = df[["group", "avgfood", "groupsize", "area"]]
+    ind_vars = ["group", "avgfood", "groupsize", "area"]
 
     samples = {}
-    combinations = itertools.chain.from_iterable(itertools.combinations(ind_vars, r) for r in range(1, len(ind_vars)+1))
+    combinations = itertools.chain.from_iterable(
+        itertools.combinations(ind_vars, r) for r in range(1, len(ind_vars) + 1)
+    )
 
     for combination in combinations:
-        sample = az.from_numpyro(run_model(normalized_df[list(combination) + ['weight']]))
+        sample = az.from_numpyro(
+            run_model(normalized_df[list(combination) + ["weight"]])
+        )
         samples[str(combination)] = sample
 
-
-    print(az.compare(samples, scale='deviance'))
+    print(az.compare(samples, scale="deviance"))
     """
                                                rank         loo     p_loo      d_loo        weight         se       dse  warning loo_scale
     ('avgfood', 'groupsize', 'area')              0  322.733075  4.468362   0.000000  0.000000e+00  15.495549  0.000000    False  deviance
@@ -86,5 +91,5 @@ def main():
     """
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
