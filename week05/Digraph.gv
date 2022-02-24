@@ -1,0 +1,11 @@
+digraph {
+	discipline [label=discipline shape=ellipse]
+	awards [label=awards shape=ellipse]
+	gender [label=gender shape=ellipse]
+	discipline -> awards
+	gender -> discipline
+	gender -> awards
+	Unobserved_0 [shape=point]
+	Unobserved_0 -> discipline [style=dashed]
+	Unobserved_0 -> awards [style=dashed]
+}
