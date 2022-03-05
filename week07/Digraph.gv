@@ -1,0 +1,17 @@
+digraph {
+	D [label=D shape=ellipse]
+	U [label=U shape=ellipse]
+	A [label=A shape=ellipse]
+	C [label=C shape=ellipse]
+	K [label=K shape=ellipse]
+	A -> K
+	A -> C
+	C -> K
+	D -> C
+	D -> K
+	D -> U
+	U -> K
+	Unobserved_0 [shape=point]
+	Unobserved_0 -> C [style=dashed]
+	Unobserved_0 -> K [style=dashed]
+}
